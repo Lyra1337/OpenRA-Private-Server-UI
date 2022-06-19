@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Lyralabs.OpenRA.PrivateServerUI.Services
@@ -34,7 +33,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
             this.AddArguments(psi.ArgumentList, options);
 
-            info.Process = Process.Start(psi);
+            info.Process = Process.Start(psi)!;
         }
 
         private void AddArguments(Collection<string> arguments, GameServerOptions options)
@@ -77,7 +76,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                     Thread.Sleep(wait);
                 }
 
-
+                info.Process.Kill(entireProcessTree: true);
             }
         }
     }

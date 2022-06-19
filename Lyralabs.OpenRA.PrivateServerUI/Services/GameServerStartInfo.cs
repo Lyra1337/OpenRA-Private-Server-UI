@@ -8,6 +8,6 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
         public Thread Thread { get; internal set; }
         public DateTime StartedAt { get; internal set; }
         public DateTime StopAt { get; internal set; }
-        public Process? Process { get; internal set; }
+        public Process Process { get; internal set; }
     }
 }

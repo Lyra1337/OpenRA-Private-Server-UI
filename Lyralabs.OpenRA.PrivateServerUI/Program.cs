@@ -1,4 +1,6 @@
-namespace Company.WebApplication1
+using Lyralabs.OpenRA.PrivateServerUI.Services;
+
+namespace Lyralabs.OpenRA.PrivateServerUI
 {
     public class Program
     {
@@ -13,6 +15,8 @@ namespace Company.WebApplication1
 
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
+
+            builder.Services.AddSingleton<GameServerService>();
 
             var app = builder.Build();
 
