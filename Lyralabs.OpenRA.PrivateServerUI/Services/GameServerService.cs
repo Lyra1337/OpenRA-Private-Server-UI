@@ -44,7 +44,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 WorkingDirectory = this.launchScriptDirectory
             };
 
-            this.AddArguments(psi.ArgumentList, options);
+            this.SetEnvironmentVariables(psi.Environment, options);
 
             Debug.WriteLine($"launching: {psi.FileName} {String.Join(" ", psi.ArgumentList)}");
 
@@ -65,7 +65,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             return port;
         }
 
-        private void AddArguments(Collection<string> arguments, GameServerOptions options)
+        private void SetEnvironmentVariables(IDictionary<string, string> environment, GameServerOptions options)
         {
             var defaults = new GameServerOptions();
 
@@ -78,9 +78,8 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                     DefaultValue = this.ConvertArgument(x.GetValue(defaults))
                 })
                 .Where(x => x.Value != x.DefaultValue)
-                .SelectMany(x => new[] { x.Name, x.Value })
                 .ToList()
-                .ForEach(arguments.Add);
+                .ForEach(x => environment[x.Name] = x.Value);
         }
 
         private string ConvertArgument(object value)
