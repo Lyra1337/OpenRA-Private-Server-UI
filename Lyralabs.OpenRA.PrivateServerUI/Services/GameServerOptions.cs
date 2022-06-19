@@ -22,5 +22,7 @@
         public int JoinChatDelay { get; set; } = 5000;
 
         public string SupportDir { get; set; } = String.Empty;
+
+        public TimeSpan RunDuration { get; set; } = TimeSpan.FromHours(8);
     }
 }
