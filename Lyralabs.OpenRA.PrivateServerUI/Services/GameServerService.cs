@@ -54,7 +54,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 .ForEach(arguments.Add);
         }
 
-        private string ConvertArgument(object? value)
+        private string ConvertArgument(object value)
         {
             if (value is bool b)
             {
@@ -66,7 +66,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             }
         }
 
-        private void ServerKiller(object? optionsObject)
+        private void ServerKiller(object optionsObject)
         {
             if (optionsObject is GameServerStartInfo info)
             {

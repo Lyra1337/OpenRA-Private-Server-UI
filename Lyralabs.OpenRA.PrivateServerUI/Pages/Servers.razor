@@ -1,0 +1,21 @@
+﻿@inherits IndexViewModel
+@page "/"
+
+<PageTitle>New Server</PageTitle>
+
+<h1>New Server</h1>
+
+<EditForm Model="Model" OnValidSubmit="this.CreateServer">
+    <InputText @bind-Value="this.Model.Name" />
+    <InputText @bind-Value="this.Model.Password" />
+    <InputSelect @bind-Value="this.Model.Mod">
+        @foreach (var value in Enum.GetValues(typeof(OpenRAMod)))
+        {
+            <option>@value</option>
+        }
+    </InputSelect>
+    <InputCheckbox @bind-Value="this.Model.AdvertiseOnline" />
+    <InputCheckbox @bind-Value="this.Model.EnableSingleplayer" />
+
+    <input type="submit" value="Create" />
+</EditForm>

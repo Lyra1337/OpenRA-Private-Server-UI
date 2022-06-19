@@ -2,10 +2,8 @@
 
 namespace Lyralabs.OpenRA.PrivateServerUI.Pages
 {
-    public class IndexViewModel : ComponentBase
+    public class ServersViewModel : ComponentBase
     {
-        public GameServerUserConfiguration Model { get; set; }
-
         [Inject]
         public GameServerService GameServerService { get; set; }
 
