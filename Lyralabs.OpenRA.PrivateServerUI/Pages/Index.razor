@@ -1,21 +1,61 @@
 ﻿@inherits IndexViewModel
 @page "/"
-
 <PageTitle>New Server</PageTitle>
 
-<h1>New Server</h1>
+<div class="container-fluid">
+    @if (this.wasServerCreated == true)
+    {
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-success">
+                    Server was created. You can connect to IP 127.0.0.1 with Port @this.serverPort
+                </div>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <EditForm Model="this.Model" OnValidSubmit="this.CreateServer">
+                    <div class="card-header">
+                        <h1 class="h4">New Server</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="input-server-name">Server Name</label>
+                            <InputText id="input-server-name" class="form-control" @bind-Value="this.Model.Name" />
+                        </div>
 
-<EditForm Model="Model" OnValidSubmit="this.CreateServer">
-    <InputText @bind-Value="this.Model.Name" />
-    <InputText @bind-Value="this.Model.Password" />
-    <InputSelect @bind-Value="this.Model.Mod">
-        @foreach (var value in Enum.GetValues(typeof(OpenRAMod)))
-        {
-            <option>@value</option>
-        }
-    </InputSelect>
-    <InputCheckbox @bind-Value="this.Model.AdvertiseOnline" />
-    <InputCheckbox @bind-Value="this.Model.EnableSingleplayer" />
+                        <div class="form-group">
+                            <label for="input-password">Server Password</label>
+                            <InputText id="input-password" class="form-control" @bind-Value="this.Model.Password" />
+                        </div>
 
-    <input type="submit" value="Create" />
-</EditForm>
+                        <div class="form-group">
+                            <label for="input-mod">Mod</label>
+                            <InputSelect id="input-mod" class="form-control" @bind-Value="this.Model.Mod">
+                                @foreach (var value in Enum.GetValues(typeof(OpenRAMod)))
+                                {
+                                    <option>@value</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div class="form-group form-check">
+                            <InputCheckbox id="input-advertise" class="form-check-input" @bind-Value="this.Model.AdvertiseOnline" />
+                            <label for="input-advertise">Advertise Online (in public server list)</label>
+                        </div>
+
+                        <div class="form-group form-check">
+                            <InputCheckbox id="input-singleplayer" class="form-check-input" @bind-Value="this.Model.EnableSingleplayer" />
+                            <label for="input-singleplayer">Enable Single Player</label>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <input class="btn btn-primary" type="submit" value="Create" />
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>

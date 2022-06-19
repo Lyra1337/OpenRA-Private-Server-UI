@@ -5,16 +5,28 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 {
     public class GameServerService
     {
-        private readonly List<GameServerStartInfo> server = new();
+        private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptPath;
+        private readonly string launchScriptDirectory;
 
         public GameServerService(IConfiguration configuration)
         {
             this.launchScriptPath = configuration.GetValue<string>("LaunchScriptPath");
+            this.launchScriptDirectory = new FileInfo(this.launchScriptPath).Directory.FullName;
         }
 
-        public void StartNewInstance(GameServerOptions options)
+        public List<GameServerOptions> GetServers()
         {
+            return this.servers
+                .Where(x => x.StopAt < DateTime.Now)
+                .Select(x => x.Options)
+                .ToList();
+        }
+
+        public int StartNewInstance(GameServerOptions options)
+        {
+            options.ListenPort = this.GetFreePort();
+
             var info = new GameServerStartInfo
             {
                 Options = options,
@@ -23,17 +35,27 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 Thread = new Thread(this.ServerKiller)
             };
 
-            this.server.Add(info);
+            this.servers.Add(info);
             info.Thread.Start(info);
 
             var psi = new ProcessStartInfo()
             {
-                FileName = this.launchScriptPath
+                FileName = this.launchScriptPath,
+                WorkingDirectory = this.launchScriptDirectory
             };
 
             this.AddArguments(psi.ArgumentList, options);
 
-            info.Process = Process.Start(psi)!;
+            Debug.WriteLine($"launching: {psi.FileName} {String.Join(" ", psi.ArgumentList)}");
+
+            info.Process = Process.Start(psi);
+
+            return options.ListenPort;
+        }
+
+        private int GetFreePort()
+        {
+            throw new NotImplementedException();
         }
 
         private void AddArguments(Collection<string> arguments, GameServerOptions options)
