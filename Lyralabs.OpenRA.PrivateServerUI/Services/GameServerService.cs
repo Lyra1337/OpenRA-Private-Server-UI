@@ -7,6 +7,12 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
     public class GameServerService
     {
         private readonly List<GameServerStartInfo> server = new();
+        private readonly string launchScriptPath;
+
+        public GameServerService(IConfiguration configuration)
+        {
+            this.launchScriptPath = configuration.GetValue<string>("LaunchScriptPath");
+        }
 
         public void StartNewInstance(GameServerOptions options)
         {
@@ -23,7 +29,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
             var psi = new ProcessStartInfo()
             {
-
+                FileName = this.launchScriptPath
             };
 
             this.AddArguments(psi.ArgumentList, options);
