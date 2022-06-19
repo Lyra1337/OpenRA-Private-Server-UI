@@ -1,5 +1,3 @@
-using Lyralabs.OpenRA.PrivateServerUI.Data;
-
 namespace Company.WebApplication1
 {
     public class Program
@@ -15,7 +13,6 @@ namespace Company.WebApplication1
 
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             var app = builder.Build();
 
