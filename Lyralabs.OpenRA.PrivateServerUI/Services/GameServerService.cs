@@ -55,7 +55,14 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
         private int GetFreePort()
         {
-            throw new NotImplementedException();
+            var port = 11100 + this.servers.Count;
+
+            while (this.servers.Any(x => x.Options.ListenPort == port) == true)
+            {
+                port++;
+            }
+
+            return port;
         }
 
         private void AddArguments(Collection<string> arguments, GameServerOptions options)
@@ -99,6 +106,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 }
 
                 info.Process.Kill(entireProcessTree: true);
+                this.servers.Remove(info);
             }
         }
     }
