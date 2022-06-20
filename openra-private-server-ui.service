@@ -1,0 +1,17 @@
+[Unit]
+Description=ASP.NET Blazor OpenRA Private Server UI
+After=network.target
+
+[Service]
+WorkingDirectory=/var/dotnet/openra-private-server-ui/
+ExecStart=/usr/bin/dotnet /var/dotnet/openra-private-server-ui/Lyralabs.OpenRA.PrivateServerUI.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=openra-private-server-ui
+User=openraadmin
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
