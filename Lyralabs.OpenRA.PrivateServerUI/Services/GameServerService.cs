@@ -7,11 +7,13 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
     {
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptPath;
+        private readonly string linuxUser;
         private readonly string launchScriptDirectory;
 
         public GameServerService(IConfiguration configuration)
         {
             this.launchScriptPath = configuration.GetValue<string>("LaunchScriptPath");
+            this.linuxUser = configuration.GetValue<string>("User");
             this.launchScriptDirectory = new FileInfo(this.launchScriptPath).Directory.FullName;
         }
 
@@ -41,12 +43,13 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             var psi = new ProcessStartInfo()
             {
                 FileName = this.launchScriptPath,
-                WorkingDirectory = this.launchScriptDirectory
+                WorkingDirectory = this.launchScriptDirectory,
+                UserName = this.linuxUser
             };
 
             this.SetEnvironmentVariables(psi.Environment, options);
 
-            Debug.WriteLine($"launching: {psi.FileName} {String.Join(" ", psi.ArgumentList)}");
+            Debug.WriteLine($"launching: {psi.FileName} with Environment {String.Join(" ", psi.Environment.Select(x => String.Concat(x.Key, "=", x.Value)))}");
 
             info.Process = Process.Start(psi);
 
