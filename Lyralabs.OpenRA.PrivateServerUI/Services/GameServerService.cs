@@ -8,6 +8,8 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
+        
+        private volatile int portOffset = 0;
 
         public GameServerService(AppSettings appSettings)
         {
@@ -58,14 +60,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
         private int GetFreePort()
         {
-            var port = 11100 + this.servers.Count;
-
-            while (this.servers.Any(x => x.Options.ListenPort == port) == true)
-            {
-                port++;
-            }
-
-            return port;
+            return 42000 + this.portOffset++;
         }
 
         private void SetEnvironmentVariables(IDictionary<string, string> environment, GameServerOptions options)
@@ -76,7 +71,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 .Where(x => x.CanRead == true)
                 .Select(x => new
                 {
-                    Name = String.Concat("-", x.Name),
+                    Name = x.Name,
                     Value = this.ConvertArgument(x.GetValue(options)),
                     DefaultValue = this.ConvertArgument(x.GetValue(defaults))
                 })
