@@ -8,7 +8,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
-        
+
         private volatile int portOffset = 0;
 
         public GameServerService(AppSettings appSettings)
@@ -43,16 +43,20 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             {
                 FileName = this.appSettings.LaunchScriptPath,
                 WorkingDirectory = this.launchScriptDirectory,
-                UserName = this.appSettings.User
+                UserName = this.appSettings.User,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
             this.SetEnvironmentVariables(psi.Environment, options);
 
             Debug.WriteLine($"launching: {psi.FileName} with Environment {String.Join(" ", psi.Environment.Select(x => String.Concat(x.Key, "=", x.Value)))}");
 
-            if (Debugger.IsAttached == false)
+            //if (Debugger.IsAttached == false)
             {
                 info.Process = Process.Start(psi);
+                info.Process.OutputDataReceived += (s, e) => info.ProcessOutput.Append(e.Data);
+                info.Process.ErrorDataReceived += (s, e) => info.ProcessOutput.Append(e.Data);
             }
 
             return options.ListenPort;

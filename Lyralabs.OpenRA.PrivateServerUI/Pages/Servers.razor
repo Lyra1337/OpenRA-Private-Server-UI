@@ -23,6 +23,11 @@
                             <dd class="col-6">Time left:</dd>
                             <dt class="col-6">@Math.Round((server.StopAt - DateTime.Now).TotalHours, 1) h</dt>
                         </dl>
+                        <div class="row">
+                            <pre>
+                                @server.ProcessOutput.ToString()
+                            </pre>
+                        </div>
                     </div>
                 </div>
             </div>

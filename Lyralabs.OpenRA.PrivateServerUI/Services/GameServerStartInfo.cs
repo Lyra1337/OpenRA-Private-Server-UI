@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Lyralabs.OpenRA.PrivateServerUI.Services
 {
@@ -9,5 +10,6 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
         public DateTime StartedAt { get; internal set; }
         public DateTime StopAt { get; internal set; }
         public Process Process { get; internal set; }
+        public StringBuilder ProcessOutput { get; } = new();
     }
 }
