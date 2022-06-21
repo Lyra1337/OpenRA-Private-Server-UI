@@ -6,15 +6,13 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
     public class GameServerService
     {
         private readonly List<GameServerStartInfo> servers = new();
-        private readonly string launchScriptPath;
-        private readonly string linuxUser;
         private readonly string launchScriptDirectory;
+        private readonly AppSettings appSettings;
 
-        public GameServerService(IConfiguration configuration)
+        public GameServerService(AppSettings appSettings)
         {
-            this.launchScriptPath = configuration.GetValue<string>("LaunchScriptPath");
-            this.linuxUser = configuration.GetValue<string>("User");
-            this.launchScriptDirectory = new FileInfo(this.launchScriptPath).Directory.FullName;
+            this.appSettings = appSettings;
+            this.launchScriptDirectory = new FileInfo(this.appSettings.LaunchScriptPath).Directory.FullName;
         }
 
         public List<GameServerOptions> GetRunningServers()
@@ -42,9 +40,9 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
             var psi = new ProcessStartInfo()
             {
-                FileName = this.launchScriptPath,
+                FileName = this.appSettings.LaunchScriptPath,
                 WorkingDirectory = this.launchScriptDirectory,
-                UserName = this.linuxUser
+                UserName = this.appSettings.User
             };
 
             this.SetEnvironmentVariables(psi.Environment, options);

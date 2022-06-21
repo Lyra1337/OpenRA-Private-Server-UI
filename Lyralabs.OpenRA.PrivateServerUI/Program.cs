@@ -8,17 +8,15 @@ namespace Lyralabs.OpenRA.PrivateServerUI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            if (String.IsNullOrWhiteSpace(builder.Configuration.GetValue<string>("LaunchScriptPath")) == true)
-            {
-                throw new ApplicationException("can't start with missing LaunchScriptPath");
-            }
-
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
             builder.Services.AddSingleton<GameServerService>();
+            builder.Services.AddSingleton(builder.Configuration.GetSection("Settings").Get<AppSettings>());
 
             var app = builder.Build();
+
+            Program.FailFast(app.Services);
 
             if (app.Environment.IsDevelopment() == false)
             {
@@ -33,6 +31,16 @@ namespace Lyralabs.OpenRA.PrivateServerUI
             app.MapFallbackToPage("/_Host");
 
             await app.RunAsync();
+        }
+
+        private static void FailFast(IServiceProvider services)
+        {
+            var settings = services.GetRequiredService<AppSettings>();
+
+            if (String.IsNullOrWhiteSpace(settings.LaunchScriptPath) == true)
+            {
+                throw new ApplicationException("can't start with missing LaunchScriptPath");
+            }
         }
     }
 }
