@@ -48,7 +48,7 @@
                         @if (this.wasServerCreated == true)
                         {
                             <div class="alert alert-success">
-                                Server was created. You can connect to IP 127.0.0.1 with Port @this.serverPort
+                                Server was created. You can connect to IP @this.AppSettings.PublicIPAddress with Port @this.serverPort
                             </div>
                         }
                     </div>

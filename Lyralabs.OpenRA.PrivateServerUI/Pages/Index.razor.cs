@@ -9,6 +9,9 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Pages
         [Inject]
         public GameServerService GameServerService { get; set; }
 
+        [Inject]
+        public AppSettings AppSettings { get; set; }
+
         protected int serverPort;
         protected bool wasServerCreated = false;
 
