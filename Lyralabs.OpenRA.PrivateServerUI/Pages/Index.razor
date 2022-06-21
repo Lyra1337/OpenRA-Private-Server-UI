@@ -3,24 +3,18 @@
 <PageTitle>New Server</PageTitle>
 
 <div class="container-fluid">
-    @if (this.wasServerCreated == true)
-    {
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-success">
-                    Server was created. You can connect to IP 127.0.0.1 with Port @this.serverPort
-                </div>
-            </div>
-        </div>
-    }
     <div class="row">
-        <div class="col">
+        <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
             <div class="card">
                 <EditForm Model="this.Model" OnValidSubmit="this.CreateServer">
+                    <DataAnnotationsValidator />
+
                     <div class="card-header">
                         <h1 class="h4">New Server</h1>
                     </div>
                     <div class="card-body">
+                        <ValidationSummary />
+
                         <div class="form-group">
                             <label for="input-server-name">Server Name</label>
                             <InputText id="input-server-name" class="form-control" @bind-Value="this.Model.Name" />
@@ -50,6 +44,13 @@
                             <InputCheckbox id="input-singleplayer" class="form-check-input" @bind-Value="this.Model.EnableSingleplayer" />
                             <label for="input-singleplayer">Enable Single Player</label>
                         </div>
+
+                        @if (this.wasServerCreated == true)
+                        {
+                            <div class="alert alert-success">
+                                Server was created. You can connect to IP 127.0.0.1 with Port @this.serverPort
+                            </div>
+                        }
                     </div>
                     <div class="card-footer">
                         <input class="btn btn-primary" type="submit" value="Create" />

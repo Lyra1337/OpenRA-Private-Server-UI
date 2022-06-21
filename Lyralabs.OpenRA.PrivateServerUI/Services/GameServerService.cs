@@ -51,7 +51,10 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
             Debug.WriteLine($"launching: {psi.FileName} with Environment {String.Join(" ", psi.Environment.Select(x => String.Concat(x.Key, "=", x.Value)))}");
 
-            info.Process = Process.Start(psi);
+            if (Debugger.IsAttached == true)
+            {
+                info.Process = Process.Start(psi);
+            }
 
             return options.ListenPort;
         }
