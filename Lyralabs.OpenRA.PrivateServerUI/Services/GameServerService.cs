@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -7,21 +8,23 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 {
     public class GameServerService : IHostedService
     {
-        private readonly Regex timestampParser = new Regex(@"^\[(?<Timestamp>([\d\-:T]+))\](.*)$", RegexOptions.Compiled);
-        private readonly Regex userJoinedParser = new Regex(@" has joined the game\.$", RegexOptions.Compiled);
-        private readonly Regex userLeftParser = new Regex(@" has disconnected\.$", RegexOptions.Compiled);
-        private readonly Regex gameStartedParser = new Regex(@"^ Game started$", RegexOptions.Compiled);
-        private readonly Regex gameResetParser = new Regex(@"^ Starting a new server instance\.\.\.$", RegexOptions.Compiled);
+        private readonly Regex timestampParser = new(@"^\[(?<Timestamp>([\d\-:T]+))\](.*)$", RegexOptions.Compiled);
+        private readonly Regex userJoinedParser = new(@" has joined the game\.$", RegexOptions.Compiled);
+        private readonly Regex userLeftParser = new(@" has disconnected\.$", RegexOptions.Compiled);
+        private readonly Regex gameStartedParser = new(@"^ Game started$", RegexOptions.Compiled);
+        private readonly Regex gameResetParser = new(@"^ Starting a new server instance\.\.\.$", RegexOptions.Compiled);
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
+        private readonly IMessenger messenger;
 
         private volatile int portOffset = 0;
         private volatile bool isShuttingDown = false;
 
-        public GameServerService(AppSettings appSettings)
+        public GameServerService(AppSettings appSettings, IMessenger messenger)
         {
             this.appSettings = appSettings;
+            this.messenger = messenger;
             this.launchScriptDirectory = new FileInfo(this.appSettings.LaunchScriptPath).Directory.FullName;
         }
 
@@ -77,12 +80,14 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 info.Process.BeginOutputReadLine();
                 info.Process.BeginErrorReadLine();
 
-                info.Process.OutputDataReceived += (s, e) => AppendOutput(e.Data, info);
-                info.Process.ErrorDataReceived += (s, e) => AppendOutput(e.Data, info);
+                info.Process.OutputDataReceived += (s, e) => this.AppendOutput(e.Data, info);
+                info.Process.ErrorDataReceived += (s, e) => this.AppendOutput(e.Data, info);
             }
 
             this.servers.Add(info);
             info.Thread.Start(info);
+
+            this.messenger.Send(new ServerUpdateMessage());
 
             return options.ListenPort;
         }
@@ -139,6 +144,8 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             }
 
             info.ProcessOutput.AppendLine(data);
+
+            this.messenger.Send(new ServerUpdateMessage());
         }
 
         private int GetFreePort()
@@ -195,6 +202,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
                 info.Process.Kill(entireProcessTree: true);
                 this.servers.Remove(info);
+                this.messenger.Send(new ServerUpdateMessage());
             }
         }
 

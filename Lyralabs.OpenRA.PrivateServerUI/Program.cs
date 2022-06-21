@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Lyralabs.OpenRA.PrivateServerUI.Services;
 
 namespace Lyralabs.OpenRA.PrivateServerUI
@@ -11,6 +12,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
+            builder.Services.AddSingleton<IMessenger, WeakReferenceMessenger>();
             builder.Services.AddSingleton<GameServerService>();
             builder.Services.AddSingleton(builder.Configuration.GetSection("Settings").Get<AppSettings>());
 
