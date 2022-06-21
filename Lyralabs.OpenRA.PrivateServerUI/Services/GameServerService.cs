@@ -36,8 +36,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 Thread = new Thread(this.ServerKiller)
             };
 
-            this.servers.Add(info);
-            info.Thread.Start(info);
+            options.EngineDir = this.appSettings.GameDir ?? this.launchScriptDirectory;
 
             var psi = new ProcessStartInfo()
             {
@@ -45,19 +44,39 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 WorkingDirectory = this.launchScriptDirectory,
                 UserName = this.appSettings.User,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false
             };
 
-            this.SetEnvironmentVariables(psi.Environment, options);
+            this.SetArguments(psi.ArgumentList, options);
 
-            Debug.WriteLine($"launching: {psi.FileName} with Environment {String.Join(" ", psi.Environment.Select(x => String.Concat(x.Key, "=", x.Value)))}");
+            Debug.WriteLine($"launching [PWD={psi.WorkingDirectory}]: {psi.FileName} {String.Join(" ", psi.ArgumentList)}");
 
             //if (Debugger.IsAttached == false)
             {
                 info.Process = Process.Start(psi);
-                info.Process.OutputDataReceived += (s, e) => info.ProcessOutput.Append(e.Data);
-                info.Process.ErrorDataReceived += (s, e) => info.ProcessOutput.Append(e.Data);
+                info.Process.EnableRaisingEvents = true;
+
+                info.Process.BeginOutputReadLine();
+                info.Process.BeginErrorReadLine();
+
+                info.Process.OutputDataReceived += (s, e) =>
+                {
+                    info.ProcessOutput.AppendLine(e.Data);
+                    Console.WriteLine(e.Data);
+                    Debug.WriteLine(e.Data);
+                };
+                info.Process.ErrorDataReceived += (s, e) =>
+                {
+                    info.ProcessOutput.AppendLine(e.Data);
+                    Console.WriteLine(e.Data);
+                    Debug.WriteLine(e.Data);
+                };
             }
+
+            this.servers.Add(info);
+            info.Thread.Start(info);
 
             return options.ListenPort;
         }
@@ -67,7 +86,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             return 42000 + this.portOffset++;
         }
 
-        private void SetEnvironmentVariables(IDictionary<string, string> environment, GameServerOptions options)
+        private void SetArguments(Collection<string> arguments, GameServerOptions options)
         {
             var defaults = new GameServerOptions();
 
@@ -77,11 +96,16 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 {
                     Name = x.Name,
                     Value = this.ConvertArgument(x.GetValue(options)),
-                    DefaultValue = this.ConvertArgument(x.GetValue(defaults))
+                    DefaultValue = this.ConvertArgument(x.GetValue(defaults)),
+                    ParameterPrefix = x.GetCustomAttributes(typeof(ParameterPrefixAttribute), inherit: false).OfType<ParameterPrefixAttribute>().SingleOrDefault()
                 })
-                .Where(x => x.Value != x.DefaultValue)
+                .Where(x => x.ParameterPrefix != null)
                 .ToList()
-                .ForEach(x => environment[x.Name] = x.Value);
+                .ForEach(x =>
+                {
+                    arguments.Add(String.Concat(x.ParameterPrefix.Prefix, ".", x.Name, "=", x.Value));
+                    //arguments.Add(String.Concat(x.ParameterPrefix.Prefix, ".", x.Name, "=", "\"", x.Value, "\""));
+                });
         }
 
         private string ConvertArgument(object value)
