@@ -6,6 +6,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Pages
     public class GameServerUserConfiguration
     {
         [Required]
+        [MaxLength(20)]
         public string Name { get; set; }
 
         [Required]
