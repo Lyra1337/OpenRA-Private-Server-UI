@@ -27,6 +27,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
         public int StartNewInstance(GameServerOptions options)
         {
+            options.Name = $"{options.Name} :: ora.lyra.bz :: Free Private Server";
             options.ListenPort = this.GetFreePort();
 
             var info = new GameServerStartInfo
