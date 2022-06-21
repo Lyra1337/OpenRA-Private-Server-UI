@@ -11,5 +11,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
         public DateTime StopAt { get; internal set; }
         public Process Process { get; internal set; }
         public StringBuilder ProcessOutput { get; } = new();
+        public int PlayerCount { get; internal set; }
+        public bool HasStarted { get; internal set; }
     }
 }

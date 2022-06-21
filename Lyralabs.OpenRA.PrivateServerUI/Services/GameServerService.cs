@@ -8,6 +8,10 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
     public class GameServerService : IHostedService
     {
         private readonly Regex timestampParser = new Regex(@"^\[(?<Timestamp>([\d\-:T]+))\](.*)$", RegexOptions.Compiled);
+        private readonly Regex userJoinedParser = new Regex(@" has joined the game\.$", RegexOptions.Compiled);
+        private readonly Regex userLeftParser = new Regex(@" has disconnected\.$", RegexOptions.Compiled);
+        private readonly Regex gameStartedParser = new Regex(@"^ Game started$", RegexOptions.Compiled);
+        private readonly Regex gameResetParser = new Regex(@"^ Starting a new server instance\.\.\.$", RegexOptions.Compiled);
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
@@ -100,9 +104,32 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 data = this.timestampParser.Replace(data, x =>
                 {
                     var timestamp = match.Groups["Timestamp"].Value;
+                    var message = x.Groups[2].Value;
+
+                    if (this.userJoinedParser.IsMatch(message) == true)
+                    {
+                        info.PlayerCount++;
+                    }
+
+                    if (this.userLeftParser.IsMatch(message) == true)
+                    {
+                        info.PlayerCount++;
+                    }
+
+                    if (this.gameResetParser.IsMatch(message) == true)
+                    {
+                        info.PlayerCount = 0;
+                        info.HasStarted = false;
+                    }
+
+                    if (this.gameStartedParser.IsMatch(message) == true)
+                    {
+                        info.HasStarted = true;
+                    }
+
                     if (DateTime.TryParseExact(timestamp, "s", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var date) == true)
                     {
-                        return $"[{(date - info.StartedAt):hh\\:mm\\:ss}]{x.Groups[2].Value}";
+                        return $"[{(date - info.StartedAt):hh\\:mm\\:ss}]{message}";
                     }
                     else
                     {

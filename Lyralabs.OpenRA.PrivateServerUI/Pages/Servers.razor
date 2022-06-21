@@ -29,6 +29,10 @@
                             <dt class="col-8">@this.AppSettings.PublicIPAddress</dt>
                             <dd class="col-4">Port:</dd>
                             <dt class="col-8">@server.Options.ListenPort</dt>
+                            <dd class="col-4">Ingame:</dd>
+                            <dt class="col-8">@server.HasStarted</dt>
+                            <dd class="col-4">Players:</dd>
+                            <dt class="col-8">@server.PlayerCount</dt>
                             <dd class="col-4">Time left:</dd>
                             <dt class="col-8">@Math.Round((server.StopAt - DateTime.Now).TotalHours, 1) h</dt>
                         </dl>
