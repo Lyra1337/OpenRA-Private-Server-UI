@@ -113,7 +113,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
                     if (this.userLeftParser.IsMatch(message) == true)
                     {
-                        info.PlayerCount++;
+                        info.PlayerCount--;
                     }
 
                     if (this.gameResetParser.IsMatch(message) == true)
