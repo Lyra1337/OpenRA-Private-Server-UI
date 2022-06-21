@@ -1,4 +1,4 @@
-﻿@inherits IndexViewModel
+﻿@inherits ServersViewModel
 @page "/servers"
 
 <PageTitle>Servers</PageTitle>
@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <dl class="row">
                             <dd class="col-6">IP:</dd>
-                            <dt class="col-6"></dt>
+                            <dt class="col-6">@this.AppSettings.PublicIPAddress</dt>
                             <dd class="col-6">Port:</dd>
                             <dt class="col-6">@server.Options.ListenPort</dt>
                             <dd class="col-6">Time left:</dd>
