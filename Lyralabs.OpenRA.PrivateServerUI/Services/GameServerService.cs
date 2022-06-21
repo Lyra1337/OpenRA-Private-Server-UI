@@ -51,7 +51,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
 
             Debug.WriteLine($"launching: {psi.FileName} with Environment {String.Join(" ", psi.Environment.Select(x => String.Concat(x.Key, "=", x.Value)))}");
 
-            if (Debugger.IsAttached == true)
+            if (Debugger.IsAttached == false)
             {
                 info.Process = Process.Start(psi);
             }
