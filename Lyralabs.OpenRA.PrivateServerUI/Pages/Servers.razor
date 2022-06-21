@@ -6,7 +6,7 @@
 <h1>Servers</h1>
 
 <ul>
-    @foreach (var server in this.GameServerService.GetServers())
+    @foreach (var server in this.GameServerService.GetRunningServers())
     {
         <li>
             <strong>@server.Name</strong>

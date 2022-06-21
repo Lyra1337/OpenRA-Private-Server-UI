@@ -17,10 +17,10 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
             this.launchScriptDirectory = new FileInfo(this.launchScriptPath).Directory.FullName;
         }
 
-        public List<GameServerOptions> GetServers()
+        public List<GameServerOptions> GetRunningServers()
         {
             return this.servers
-                .Where(x => x.StopAt < DateTime.Now)
+                .Where(x => x.StopAt > DateTime.Now)
                 .Select(x => x.Options)
                 .ToList();
         }
