@@ -1,10 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Lyralabs.OpenRA.PrivateServerUI.Services
 {
     public class GameServerService : IHostedService
     {
+        private readonly Regex timestampParser = new Regex(@"^\[(?<Timestamp>([\d\-:T]+))\](.*)$", RegexOptions.Compiled);
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
@@ -70,24 +73,45 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 info.Process.BeginOutputReadLine();
                 info.Process.BeginErrorReadLine();
 
-                info.Process.OutputDataReceived += (s, e) =>
-                {
-                    info.ProcessOutput.AppendLine(e.Data);
-                    Console.WriteLine(e.Data);
-                    Debug.WriteLine(e.Data);
-                };
-                info.Process.ErrorDataReceived += (s, e) =>
-                {
-                    info.ProcessOutput.AppendLine(e.Data);
-                    Console.WriteLine(e.Data);
-                    Debug.WriteLine(e.Data);
-                };
+                info.Process.OutputDataReceived += (s, e) => AppendOutput(e.Data, info);
+                info.Process.ErrorDataReceived += (s, e) => AppendOutput(e.Data, info);
             }
 
             this.servers.Add(info);
             info.Thread.Start(info);
 
             return options.ListenPort;
+        }
+
+        private void AppendOutput(string data, GameServerStartInfo info)
+        {
+            if (String.IsNullOrEmpty(data) == true)
+            {
+                return;
+            }
+
+            Console.WriteLine(data);
+            Debug.WriteLine(data);
+
+            var match = this.timestampParser.Match(data);
+
+            if (match.Success == true)
+            {
+                data = this.timestampParser.Replace(data, x =>
+                {
+                    var timestamp = match.Groups["Timestamp"].Value;
+                    if (DateTime.TryParseExact(timestamp, "s", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var date) == true)
+                    {
+                        return $"[{(date - info.StartedAt):hh\\:mm\\:ss}]{x.Groups[2].Value}";
+                    }
+                    else
+                    {
+                        return "$0";
+                    }
+                });
+            }
+
+            info.ProcessOutput.AppendLine(data);
         }
 
         private int GetFreePort()
