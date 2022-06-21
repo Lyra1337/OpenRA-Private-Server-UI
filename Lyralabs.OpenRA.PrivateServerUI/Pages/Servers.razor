@@ -9,19 +9,19 @@
     <div class="row">
         @foreach (var server in this.GameServerService.GetRunningServers())
         {
-            <div class="col-md-3">
+            <div class="col-sm-12 col-md-6 col-xl-4">
                 <div class="card">
                     <div class="card-header">
-                        <strong>@server.Name</strong>
+                        <strong>@server.Options.Name</strong>
                     </div>
                     <div class="card-body">
                         <dl class="row">
-                            <dd class="col-6">IP</dd>
+                            <dd class="col-6">IP:</dd>
                             <dt class="col-6"></dt>
-                            <dd class="col-6">Port</dd>
-                            <dt class="col-6">@server.ListenPort</dt>
-                            <dd class="col-6">Time left</dd>
-                            <dt class="col-6">3h</dt>
+                            <dd class="col-6">Port:</dd>
+                            <dt class="col-6">@server.Options.ListenPort</dt>
+                            <dd class="col-6">Time left:</dd>
+                            <dt class="col-6">@Math.Round((server.StopAt - DateTime.Now).TotalHours, 1) h</dt>
                         </dl>
                     </div>
                 </div>
