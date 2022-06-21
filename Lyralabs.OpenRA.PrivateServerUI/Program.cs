@@ -14,6 +14,8 @@ namespace Lyralabs.OpenRA.PrivateServerUI
             builder.Services.AddSingleton<GameServerService>();
             builder.Services.AddSingleton(builder.Configuration.GetSection("Settings").Get<AppSettings>());
 
+            builder.Services.AddHostedService(di => di.GetRequiredService<GameServerService>());
+
             var app = builder.Build();
 
             Program.FailFast(app.Services);

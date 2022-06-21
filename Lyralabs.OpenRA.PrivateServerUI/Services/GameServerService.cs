@@ -3,13 +3,14 @@ using System.Diagnostics;
 
 namespace Lyralabs.OpenRA.PrivateServerUI.Services
 {
-    public class GameServerService
+    public class GameServerService : IHostedService
     {
         private readonly List<GameServerStartInfo> servers = new();
         private readonly string launchScriptDirectory;
         private readonly AppSettings appSettings;
 
         private volatile int portOffset = 0;
+        private volatile bool isShuttingDown = false;
 
         public GameServerService(AppSettings appSettings)
         {
@@ -48,6 +49,13 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 RedirectStandardInput = true,
                 UseShellExecute = false
             };
+
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                psi.ArgumentList.Add("--debug");
+                psi.ArgumentList.Add(psi.FileName);
+                psi.FileName = "mono";
+            }
 
             this.SetArguments(psi.ArgumentList, options);
 
@@ -127,12 +135,29 @@ namespace Lyralabs.OpenRA.PrivateServerUI.Services
                 var wait = info.StopAt - DateTime.Now;
                 if (wait.TotalSeconds > 1)
                 {
-                    Thread.Sleep(wait);
+                    for (int i = 0; i < (int)wait.TotalSeconds && this.isShuttingDown == false; i++)
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                    }
                 }
 
                 info.Process.Kill(entireProcessTree: true);
                 this.servers.Remove(info);
             }
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            this.isShuttingDown = false;
+            return Task.CompletedTask;
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            this.isShuttingDown = true;
+
+            await Task.Delay(TimeSpan.FromSeconds(3));
+            this.servers.ForEach(x => x.Process.Kill(entireProcessTree: true));
         }
     }
 }
