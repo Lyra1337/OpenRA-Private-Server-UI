@@ -15,6 +15,7 @@ namespace Lyralabs.OpenRA.PrivateServerUI
             builder.Services.AddSingleton<IMessenger, WeakReferenceMessenger>();
             builder.Services.AddSingleton<GameServerService>();
             builder.Services.AddSingleton(builder.Configuration.GetSection("Settings").Get<AppSettings>());
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddHostedService(di => di.GetRequiredService<GameServerService>());
 
